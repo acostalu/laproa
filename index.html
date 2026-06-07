@@ -32,10 +32,6 @@
     background: var(--negro);
   }
 
-  html.light-mode {
-    background: #faf8f5;
-  }
-
   body {
     background-color: var(--crema);
     color: var(--marron);
@@ -44,6 +40,7 @@
     margin: 0;
     padding: 0;
     width: 100%;
+    transition: background-color 400ms cubic-bezier(1,0,0.4,1), color 400ms cubic-bezier(1,0,0.4,1);
   }
 
   body.light-mode {
@@ -143,282 +140,106 @@
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.35));
   }
 
-  /* ─── LIQUID GLASS TOGGLE ─── */
-  :root {
-    --transition: 0.2s;
-    --ease: ease-out;
-  }
-
-  .liquid-toggle-container {
-    position: absolute;
+  /* ─── LIQUID GLASS BUTTON (theme toggle) ─── */
+  .glass-button {
+    position: fixed;
     top: 1.2rem;
     right: 1.2rem;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    z-index: 1001;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 17px;
+    cursor: pointer;
+    overflow: hidden;
+    background: transparent;
+    transition: transform 0.2s ease;
+    outline: none;
   }
 
-  .toggle-label {
+  .glass-button:hover  { transform: scale(1.05); }
+  .glass-button:active { transform: scale(0.95); }
+
+  .glass-filter,
+  .glass-overlay,
+  .glass-specular {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .glass-filter {
+    z-index: 1;
+    backdrop-filter: blur(4px);
+    filter: url(#glass-distortion) saturate(120%) brightness(1.15);
+  }
+
+  .glass-overlay {
+    z-index: 2;
+    background: rgba(201, 168, 76, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.35);
+    transition: background 400ms ease;
+  }
+
+  .glass-specular {
+    z-index: 3;
+    box-shadow: inset 1px 1px 1px rgba(255,255,255,0.6);
+  }
+
+  .glass-content {
+    position: relative;
+    z-index: 4;
+    color: #ffffff;
     font-family: 'Special Elite', cursive;
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
-    transition: color 0.3s;
-  }
-
-  body.light-mode .toggle-label {
-    color: rgba(26,16,8,0.4);
-  }
-
-  /* Liquid toggle core styles */
-  .liquid-toggle {
-    --unchecked: hsl(218, 8%, 81%);
-    --checked: hsl(var(--hue, 144), calc((8 + (var(--complete, 0) / 100 * 92)) * 1%), calc((81 - (var(--complete, 0) / 100 * (81 - 43))) * 1%));
-    --control: hsl(300, 100%, 100%);
-    --border: 0px;
-    --width: 100;
-    --height: 44;
-    height: calc(var(--height) * 1px);
-    width: calc(var(--width) * 1px);
-    border-radius: 100px;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    position: relative;
-    overflow: visible;
-    container-type: inline-size;
-    background: #0000;
-    transition: outline var(--transition) var(--ease);
-    outline-offset: 2px;
-  }
-
-  .liquid-toggle:focus-visible {
-    outline: 3px solid color-mix(in oklch, var(--checked), #0000);
-  }
-
-  .liquid-toggle:active { outline: none; }
-
-  .indicator {
-    border-radius: 100px;
-    pointer-events: none;
-    height: 100%;
-    width: 100%;
-    background: var(--checked);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-  }
-
-  .knockout {
-    height: calc(var(--height) * 1px);
-    width: calc(var(--width) * 1px);
-    border-radius: 100px;
-    filter: url(#remove-black);
-    position: absolute;
-    inset: 0;
-    will-change: filter;
-    transform: translate3d(0,0,0);
-  }
-
-  .indicator--masked {
-    background: var(--checked);
-    z-index: 12;
-    height: 100%;
-    width: 100%;
-    translate: -50% -50%;
-    container-type: inline-size;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border-radius: 100px;
-
-    .mask {
-      position: absolute;
-      height: calc(100% - (2 * var(--border)));
-      width: calc(60% - (2 * var(--border)));
-      top: 50%;
-      background: #000;
-      left: var(--border);
-      border-radius: 100px;
-      translate: calc((var(--complete, 0) / 100) * (100cqi - 100% - (6 * var(--border)))) -50%;
-      transition-property: height, width, margin, translate;
-      transition-duration: var(--transition);
-      transition-timing-function: var(--ease);
-    }
-  }
-
-  .wrapper {
-    position: absolute;
-    inset: 0;
-    border-radius: 100px;
-    clip-path: inset(0 0 0 0 round 100px);
-    filter: blur(5px);
-    transition: filter var(--transition) var(--ease);
-  }
-
-  .liquids {
-    position: absolute;
-    inset: 0;
-    transform: translate3d(0,0,0);
-    border-radius: 100px;
-    overflow: hidden;
-    filter: url(#goo);
-
-    .liquid__shadow {
-      position: absolute;
-      inset: 0;
-      box-shadow: inset 0px 0px 3px 4px var(--checked),
-        inset calc(((var(--complete, 0) / 100) * 8px) + -4px) 0px 3px 4px var(--checked);
-      border-radius: 100px;
-    }
-
-    .liquid__track {
-      content: '';
-      height: calc((var(--height) * 1px) - (0 * var(--border)));
-      width: calc((var(--width) * 1px) - (0 * var(--border)));
-      background: var(--checked);
-      border-radius: 100px;
-      position: absolute;
-      top: 50%;
-      left: 0;
-      translate: calc((var(--complete, 0) / 100) * (100cqi - 100% - (6 * var(--border)))) -50%;
-      transition-property: height, width, left;
-      transition-duration: var(--transition);
-      transition-timing-function: var(--ease);
-    }
-  }
-
-  .indicator__liquid {
-    position: absolute;
-    height: calc(100% - (2 * var(--border)));
-    width: calc(60% - (2 * var(--border)));
-    container-type: inline-size;
-    top: 50%;
-    background: #0000;
-    left: var(--border);
-    border-radius: 100px;
-    translate: calc((var(--complete, 0) / 100) * (100cqi - 100% - (2 * var(--border)))) -50%;
-    transition-property: scale, translate;
-    transition-duration: var(--transition);
-    transition-timing-function: var(--ease);
-
-    .shadow {
-      opacity: 0;
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 100px;
-      box-shadow:
-        1px -1px 2px hsl(0 0% 100% / 0.5) inset,
-        0px -1px 2px hsl(0 0% 100% / 0.5) inset,
-        -1px -1px 2px hsl(0 0% 100% / 0.5) inset,
-        1px 1px 2px hsl(0 0% 30% / 0.5) inset,
-        -8px 4px 10px -6px hsl(0 0% 30% / 0.25) inset,
-        -1px 1px 6px hsl(0 0% 30% / 0.25) inset,
-        -1px -1px 8px hsl(0 0% 60% / 0.15),
-        1px 1px 2px hsl(0 0% 30% / 0.15),
-        2px 2px 6px hsl(0 0% 30% / 0.15),
-        -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
-        3px 6px 16px -6px hsl(0 0% 30% / 0.5);
-      z-index: 20;
-      transition: opacity var(--transition) var(--ease);
-    }
-
-    .cover {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: white;
-      border-radius: 100px;
-      transition: opacity var(--transition) var(--ease);
-    }
-  }
-
-  /* Active states */
-  .liquid-toggle:active .indicator--masked .mask {
-    height: calc((100% - (2 * var(--border))) * 1.65);
-    width: calc((60% - (2 * var(--border))) * 1.65);
-    margin-left: calc((60% - (2 * var(--border))) * -0.325);
-  }
-
-  .liquid-toggle:active .indicator__liquid {
-    scale: 1.65 1.65;
-  }
-
-  .liquid-toggle:active .wrapper {
-    filter: blur(0px);
-  }
-
-  .liquid-toggle:active .indicator__liquid .shadow { opacity: 1; }
-  .liquid-toggle:active .indicator__liquid .cover { opacity: 0; }
-
-  .liquid-toggle:active .indicator__liquid .liquid__track {
-    left: calc(var(--border) * 3);
-    height: calc((var(--height) * 1px) - (6 * var(--border)));
-  }
-
-  /* Icons inside toggle */
-  .toggle-icons {
-    position: absolute;
-    inset: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 10px;
-    z-index: 20;
-    pointer-events: none;
+    gap: 0.4rem;
+    white-space: nowrap;
   }
-
-  .toggle-icon-inner {
-    font-size: 0.75rem;
-    line-height: 1;
-    transition: opacity 0.3s;
-  }
-
-  /* dark mode: moon visible (right), sun dimmed */
-  .toggle-icon-inner.sun { opacity: 0.35; }
-  .toggle-icon-inner.moon { opacity: 1; }
-
-  /* light mode: sun visible (left), moon dimmed */
-  body.light-mode .toggle-icon-inner.sun { opacity: 1; }
-  body.light-mode .toggle-icon-inner.moon { opacity: 0.35; }
 
   /* ─── LIGHT MODE OVERRIDES ─── */
+  body.light-mode .glass-overlay { background: rgba(201, 168, 76, 0.18); }
+  body.light-mode .glass-content { color: var(--negro); }
+
   body.light-mode .hero { background: #faf8f5; }
-  body.light-mode .hero-tagline { color: rgba(26,16,8,0.75); }
-  body.light-mode .hero-badge { color: var(--marron); border-color: rgba(26,16,8,0.12); background: rgba(230,220,210,0.3); }
+  body.light-mode .hero-tagline { color: #2a1a0f; }
+  body.light-mode .hero-badge { color: #2a1a0f; border-color: rgba(26,16,8,0.15); background: rgba(230,220,210,0.3); }
   body.light-mode .section-menu { background: #faf8f5; }
   body.light-mode .section-menu::before { background-image: repeating-linear-gradient(45deg, rgba(26,16,8,0.05) 0px, rgba(26,16,8,0.05) 1px, transparent 1px, transparent 20px); }
   body.light-mode .menu-item, body.light-mode .pizzeta-item, body.light-mode .review-card, body.light-mode .extras-box { background: rgba(245,240,235,0.8); }
   body.light-mode .menu-header .section-title { color: var(--verde-oscuro); }
-  body.light-mode .menu-item-name, body.light-mode .menu-item-desc, body.light-mode .menu-item-price, body.light-mode .extra-item, body.light-mode .review-text, body.light-mode .info-row-text, body.light-mode .review-author { color: var(--marron); }
+  body.light-mode .menu-item-name, body.light-mode .menu-item-desc, body.light-mode .menu-item-price, body.light-mode .extra-item, body.light-mode .review-text, body.light-mode .info-row-text, body.light-mode .review-author { color: #2a1a0f; }
   body.light-mode .section-info { background: #f0eae0; }
-  body.light-mode .cta-final { background: #f0eae0; color: var(--marron); }
-  body.light-mode .cta-final h2 { color: var(--marron); }
-  body.light-mode .cta-final p { color: rgba(26,16,8,0.65); }
-  body.light-mode .cta-phone { color: var(--verde); }
-  body.light-mode .cta-phone:hover { color: var(--dorado); }
-  body.light-mode footer { background: #f0eae0; color: rgba(26,16,8,0.55); border-top-color: rgba(26,16,8,0.1); }
-  body.light-mode .tab-btn { color: rgba(26,16,8,0.65); border-color: rgba(26,16,8,0.15); }
+  body.light-mode .cta-final { background: #f0eae0; color: #2a1a0f; }
+  body.light-mode .cta-final h2 { color: #2a1a0f; }
+  body.light-mode .cta-final p { color: #2a1a0f; }
+  body.light-mode .cta-phone { color: var(--verde-oscuro); }
+  body.light-mode .cta-phone:hover { color: var(--rojo); }
+  body.light-mode footer { background: #caad7b; color: #2a1a0f; border-top-color: rgba(26,16,8,0.1); }
+  body.light-mode .tab-btn { color: #2a1a0f; border-color: rgba(26,16,8,0.15); }
   body.light-mode .tab-btn:hover, body.light-mode .tab-btn.active { background: var(--dorado); color: var(--negro); border-color: var(--dorado); }
-  body.light-mode .hero-scroll { color: rgba(26,16,8,0.3); }
+  body.light-mode .hero-scroll { color: #5a4a40; }
   body.light-mode .hero-divider { background: linear-gradient(90deg, transparent, var(--dorado), transparent); }
   body.light-mode .section-label { color: var(--rojo); }
   body.light-mode .section-title { color: var(--verde-oscuro); }
-  body.light-mode .section-text { color: rgba(26,16,8,0.75); }
-  body.light-mode .stars-text { color: rgba(26,16,8,0.7); }
+  body.light-mode .section-text { color: #2a1a0f; }
+  body.light-mode .stars-text { color: #2a1a0f; }
   body.light-mode .review-card { background: rgba(245,240,235,0.7); box-shadow: 2px 2px 0 rgba(0,0,0,0.04); }
   body.light-mode .review-card:hover { box-shadow: 4px 4px 0 rgba(0,0,0,0.06); }
   body.light-mode .info-block-title { color: var(--verde-oscuro); border-bottom-color: rgba(26,16,8,0.1); }
-  body.light-mode .info-row-text { color: rgba(26,16,8,0.7); }
+  body.light-mode .info-row-text { color: #2a1a0f; }
   body.light-mode .gallery-item { background: rgba(245,240,235,0.5); border-color: rgba(26,16,8,0.1); }
-  body.light-mode .info-bar { background: #e8dcc8; color: rgba(26,16,8,0.8); }
-  body.light-mode .info-item { color: rgba(26,16,8,0.8); }
+  body.light-mode .gallery-item figcaption { color: #2a1a0f; background: rgba(245,240,235,0.95); }
+  body.light-mode .info-bar { background: #e8dcc8; color: #2a1a0f; }
+  body.light-mode .info-item { color: #2a1a0f; }
   body.light-mode .section-nosotros { background: #faf8f5; }
   body.light-mode .section-reviews { background: #f0eae0; }
+  body.light-mode .pizzeta-desc { color: #2a1a0f; }
+  body.light-mode .gallery-title { color: var(--verde-oscuro); }
+  body.light-mode .info-row-text a { color: #2a1a0f; }
+  body.light-mode .info-row-text a:hover { color: var(--rojo); }
 
   .hero-logo-la { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 6rem); font-style: italic; color: var(--rojo); line-height: 0.9; display: block; }
   .hero-logo-proa { font-family: 'Playfair Display', serif; font-size: clamp(5rem, 15vw, 11rem); font-weight: 900; color: var(--verde); line-height: 0.85; display: block; letter-spacing: -0.02em; text-shadow: 4px 4px 0px var(--verde-oscuro); }
@@ -548,51 +369,25 @@
 </head>
 <body>
 
-<!-- SVG filters for liquid glass -->
-<svg class="sr-only" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <filter id="goo">
-      <feGaussianBlur result="SvgjsFeGaussianBlur1000" in="SourceGraphic" stdDeviation="13"></feGaussianBlur>
-      <feColorMatrix result="SvgjsFeColorMatrix1001" in="SvgjsFeGaussianBlur1000"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 13 -10" type="matrix"></feColorMatrix>
-      <feComposite result="SvgjsFeComposite1002" in="SvgjsFeColorMatrix1001" operator="atop"></feComposite>
-    </filter>
-    <filter id="remove-black" color-interpolation-filters="sRGB">
-      <feColorMatrix type="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -255 -255 -255 0 1"
-        result="black-pixels"/>
-      <feMorphology in="black-pixels" operator="dilate" radius="0.5" result="smoothed"/>
-      <feComposite in="SourceGraphic" in2="smoothed" operator="out"/>
-    </filter>
-  </defs>
+<!-- SVG Filter for Glass Distortion -->
+<svg style="display:none">
+  <filter id="glass-distortion">
+    <feTurbulence type="turbulence" baseFrequency="0.008" numOctaves="2" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="77" />
+  </filter>
 </svg>
 
 <!-- ══ HERO ══ -->
 <section class="hero">
-  <div class="liquid-toggle-container">
-    <span class="toggle-label" id="toggleLabel">oscuro</span>
-    <button aria-label="Cambiar tema" aria-pressed="false" class="liquid-toggle" id="themeToggle">
-      <div class="knockout">
-        <div class="indicator indicator--masked">
-          <div class="mask"></div>
-        </div>
-      </div>
-      <div class="indicator__liquid">
-        <div class="shadow"></div>
-        <div class="wrapper">
-          <div class="liquids">
-            <div class="liquid__shadow"></div>
-            <div class="liquid__track"></div>
-          </div>
-        </div>
-        <div class="cover"></div>
-      </div>
-      <div class="toggle-icons">
-        <span class="toggle-icon-inner sun">☀️</span>
-        <span class="toggle-icon-inner moon">🌙</span>
-      </div>
-    </button>
-  </div>
+  <button class="glass-button" id="themeToggle" aria-label="Cambiar tema">
+    <div class="glass-filter"></div>
+    <div class="glass-overlay"></div>
+    <div class="glass-specular"></div>
+    <div class="glass-content">
+      <span id="themeIcon">🌙</span>
+      <span id="themeLabel">oscuro</span>
+    </div>
+  </button>
   <div class="hero-bg"></div>
   <div class="hero-lines"></div>
   <div class="hero-content">
@@ -828,61 +623,45 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-  // ── Liquid Glass Toggle ──
-  const toggle = document.getElementById('themeToggle');
-  const label = document.getElementById('toggleLabel');
-
-  function setComplete(val) {
-    toggle.style.setProperty('--complete', val);
-    // also sync the liquid__track translate via CSS var
-  }
+  // ── Liquid Glass Theme Toggle ──
+  const toggle   = document.getElementById('themeToggle');
+  const icon     = document.getElementById('themeIcon');
+  const label    = document.getElementById('themeLabel');
+  const specular = toggle.querySelector('.glass-specular');
 
   function applyTheme(theme) {
     const isLight = theme === 'light';
-    document.documentElement.classList.toggle('light-mode', isLight);
     document.body.classList.toggle('light-mode', isLight);
-    toggle.setAttribute('aria-pressed', String(isLight));
+    icon.textContent  = isLight ? '☀️' : '🌙';
     label.textContent = isLight ? 'claro' : 'oscuro';
     localStorage.setItem('theme', theme);
-
-    // Animate the toggle
-    const target = isLight ? 100 : 0;
-    animateComplete(target);
   }
 
-  let animFrame;
-  function animateComplete(target) {
-    cancelAnimationFrame(animFrame);
-    const current = parseFloat(toggle.style.getPropertyValue('--complete') || '0');
-    const diff = target - current;
-    if (Math.abs(diff) < 0.5) { setComplete(target); return; }
-    setComplete(current + diff * 0.18);
-    animFrame = requestAnimationFrame(() => animateComplete(target));
-  }
+  // Restore saved theme
+  const saved = localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  applyTheme(saved);
 
-  // Init
-  const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-  // Set immediately without animation
-  const initIsLight = initialTheme === 'light';
-  document.documentElement.classList.toggle('light-mode', initIsLight);
-  document.body.classList.toggle('light-mode', initIsLight);
-  toggle.setAttribute('aria-pressed', String(initIsLight));
-  label.textContent = initIsLight ? 'claro' : 'oscuro';
-  setComplete(initIsLight ? 100 : 0);
-
+  // Toggle on click
   toggle.addEventListener('click', () => {
-    const isLight = document.body.classList.contains('light-mode');
-    applyTheme(isLight ? 'dark' : 'light');
+    applyTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light');
   });
 
-  toggle.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      const isLight = document.body.classList.contains('light-mode');
-      applyTheme(isLight ? 'dark' : 'light');
-    }
+  // Mouse movement highlight (from liquid-button.js)
+  toggle.addEventListener('mousemove', function(e) {
+    const rect = this.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    specular.style.background = `radial-gradient(
+      circle at ${x}px ${y}px,
+      rgba(255,255,255,0.22) 0%,
+      rgba(255,255,255,0.07) 30%,
+      rgba(255,255,255,0) 60%
+    )`;
+  });
+
+  toggle.addEventListener('mouseleave', function() {
+    specular.style.background = 'none';
   });
 </script>
 </body>
