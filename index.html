@@ -23,13 +23,31 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html { 
+    scroll-behavior: smooth;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--negro);
+  }
+
+  html.light-mode {
+    background: #faf8f5;
+  }
 
   body {
     background-color: var(--crema);
     color: var(--marron);
     font-family: 'Lora', Georgia, serif;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  body.light-mode {
+    background-color: #faf8f5;
   }
 
   /* TEXTURA DE FONDO */
@@ -54,6 +72,15 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    left: 0;
+  }
+
+  body.light-mode .hero {
+    background: #faf8f5;
   }
 
   .hero-bg {
@@ -63,9 +90,10 @@
       radial-gradient(ellipse at 20% 50%, rgba(192,57,43,0.15) 0%, transparent 60%),
       radial-gradient(ellipse at 80% 20%, rgba(26,107,42,0.12) 0%, transparent 50%),
       radial-gradient(ellipse at 60% 80%, rgba(201,168,76,0.08) 0%, transparent 50%);
+    top: 0;
+    left: 0;
   }
 
-  /* Líneas decorativas */
   .hero-lines {
     position: absolute;
     inset: 0;
@@ -115,6 +143,7 @@
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.35));
   }
 
+  /* ─── LIQUID GLASS TOGGLE ─── */
   :root {
     --transition: 0.2s;
     --ease: ease-out;
@@ -124,19 +153,33 @@
     position: absolute;
     top: 1.2rem;
     right: 1.2rem;
-    z-index: 4;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
   }
 
+  .toggle-label {
+    font-family: 'Special Elite', cursive;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    transition: color 0.3s;
+  }
+
+  body.light-mode .toggle-label {
+    color: rgba(26,16,8,0.4);
+  }
+
+  /* Liquid toggle core styles */
   .liquid-toggle {
     --unchecked: hsl(218, 8%, 81%);
-    --checked: hsl(144, 92%, 43%);
+    --checked: hsl(var(--hue, 144), calc((8 + (var(--complete, 0) / 100 * 92)) * 1%), calc((81 - (var(--complete, 0) / 100 * (81 - 43))) * 1%));
     --control: hsl(300, 100%, 100%);
-    --border: 5px;
-    --width: 140;
-    --height: 60;
-    --complete: 0;
-    --hue: 144;
-    --delta: 0;
+    --border: 4px;
+    --width: 100;
+    --height: 44;
     height: calc(var(--height) * 1px);
     width: calc(var(--width) * 1px);
     border-radius: 100px;
@@ -146,9 +189,16 @@
     position: relative;
     overflow: visible;
     container-type: inline-size;
-    background: transparent;
-    outline: none;
+    background: #0000;
+    transition: outline var(--transition) var(--ease);
+    outline-offset: 2px;
   }
+
+  .liquid-toggle:focus-visible {
+    outline: 3px solid color-mix(in oklch, var(--checked), #0000);
+  }
+
+  .liquid-toggle:active { outline: none; }
 
   .indicator {
     border-radius: 100px;
@@ -169,6 +219,8 @@
     filter: url(#remove-black);
     position: absolute;
     inset: 0;
+    will-change: filter;
+    transform: translate3d(0,0,0);
   }
 
   .indicator--masked {
@@ -177,18 +229,25 @@
     height: 100%;
     width: 100%;
     translate: -50% -50%;
-  }
-
-  .indicator--masked .mask {
+    container-type: inline-size;
     position: absolute;
-    height: calc(100% - (2 * var(--border)));
-    width: calc(60% - (2 * var(--border)));
     top: 50%;
-    background: #000;
-    left: var(--border);
+    left: 50%;
     border-radius: 100px;
-    translate: calc((var(--complete) / 100) * (100cqi - 60cqi)) -50%;
-    transition: translate 0.2s ease-out;
+
+    .mask {
+      position: absolute;
+      height: calc(100% - (2 * var(--border)));
+      width: calc(60% - (2 * var(--border)));
+      top: 50%;
+      background: #000;
+      left: var(--border);
+      border-radius: 100px;
+      translate: calc((var(--complete, 0) / 100) * (100cqi - 100% - (6 * var(--border)))) -50%;
+      transition-property: height, width, margin, translate;
+      transition-duration: var(--transition);
+      transition-timing-function: var(--ease);
+    }
   }
 
   .wrapper {
@@ -196,835 +255,283 @@
     inset: 0;
     border-radius: 100px;
     clip-path: inset(0 0 0 0 round 100px);
-    filter: blur(6px);
-    transition: filter 0.2s ease-out;
+    filter: blur(5px);
+    transition: filter var(--transition) var(--ease);
   }
 
   .liquids {
     position: absolute;
     inset: 0;
+    transform: translate3d(0,0,0);
     border-radius: 100px;
     overflow: hidden;
     filter: url(#goo);
-  }
 
-  .liquid__shadow {
-    position: absolute;
-    inset: 0;
-    box-shadow: inset 0px 0px 3px 4px var(--checked);
-    border-radius: 100px;
-  }
+    .liquid__shadow {
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0px 0px 3px 4px var(--checked),
+        inset calc(((var(--complete, 0) / 100) * 8px) + -4px) 0px 3px 4px var(--checked);
+      border-radius: 100px;
+    }
 
-  .liquid__track {
-    height: calc(var(--height) * 1px);
-    width: calc(var(--width) * 1px);
-    background: var(--checked);
-    border-radius: 100px;
-    position: absolute;
-    top: 50%;
-    translate: calc((var(--complete) / 100) * (100cqi - 100%)) -50%;
-    transition: translate 0.2s ease-out;
+    .liquid__track {
+      content: '';
+      height: calc((var(--height) * 1px) - (0 * var(--border)));
+      width: calc((var(--width) * 1px) - (0 * var(--border)));
+      background: var(--checked);
+      border-radius: 100px;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      translate: calc((var(--complete, 0) / 100) * (100cqi - 100% - (6 * var(--border)))) -50%;
+      transition-property: height, width, left;
+      transition-duration: var(--transition);
+      transition-timing-function: var(--ease);
+    }
   }
 
   .indicator__liquid {
     position: absolute;
     height: calc(100% - (2 * var(--border)));
     width: calc(60% - (2 * var(--border)));
+    container-type: inline-size;
     top: 50%;
-    background: transparent;
+    background: #0000;
     left: var(--border);
     border-radius: 100px;
-    translate: calc((var(--complete) / 100) * (100cqi - 100%)) -50%;
+    translate: calc((var(--complete, 0) / 100) * (100cqi - 100% - (2 * var(--border)))) -50%;
+    transition-property: scale, translate;
+    transition-duration: var(--transition);
+    transition-timing-function: var(--ease);
+
+    .shadow {
+      opacity: 0;
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      box-shadow:
+        1px -1px 2px hsl(0 0% 100% / 0.5) inset,
+        0px -1px 2px hsl(0 0% 100% / 0.5) inset,
+        -1px -1px 2px hsl(0 0% 100% / 0.5) inset,
+        1px 1px 2px hsl(0 0% 30% / 0.5) inset,
+        -8px 4px 10px -6px hsl(0 0% 30% / 0.25) inset,
+        -1px 1px 6px hsl(0 0% 30% / 0.25) inset,
+        -1px -1px 8px hsl(0 0% 60% / 0.15),
+        1px 1px 2px hsl(0 0% 30% / 0.15),
+        2px 2px 6px hsl(0 0% 30% / 0.15),
+        -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
+        3px 6px 16px -6px hsl(0 0% 30% / 0.5);
+      z-index: 20;
+      transition: opacity var(--transition) var(--ease);
+    }
+
+    .cover {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: white;
+      border-radius: 100px;
+      transition: opacity var(--transition) var(--ease);
+    }
   }
 
-  .indicator__liquid .shadow {
-    opacity: 0;
-    position: absolute;
-    inset: 0;
-    border-radius: 100px;
-    box-shadow: inset 0 -1px 2px hsl(0 0% 100% / 0.5);
-    transition: opacity 0.2s ease-out;
-  }
-
-  .indicator__liquid .cover {
-    position: absolute;
-    inset: 0;
-    background: white;
-    border-radius: 100px;
-    transition: opacity 0.2s ease-out;
-  }
-
-  [data-active='true'] .indicator--masked .mask {
+  /* Active states */
+  .liquid-toggle:active .indicator--masked .mask {
     height: calc((100% - (2 * var(--border))) * 1.65);
     width: calc((60% - (2 * var(--border))) * 1.65);
+    margin-left: calc((60% - (2 * var(--border))) * -0.325);
   }
 
-  [data-active='true'] .indicator__liquid {
-    scale: 1.65;
+  .liquid-toggle:active .indicator__liquid {
+    scale: 1.65 1.65;
   }
 
-  [data-active='true'] .wrapper {
+  .liquid-toggle:active .wrapper {
     filter: blur(0px);
   }
 
-  [data-active='true'] .indicator__liquid .shadow {
-    opacity: 1;
+  .liquid-toggle:active .indicator__liquid .shadow { opacity: 1; }
+  .liquid-toggle:active .indicator__liquid .cover { opacity: 0; }
+
+  .liquid-toggle:active .indicator__liquid .liquid__track {
+    left: calc(var(--border) * 3);
+    height: calc((var(--height) * 1px) - (6 * var(--border)));
   }
 
-  [data-active='true'] .indicator__liquid .cover {
-    opacity: 0;
-  }
-
-  body.light-mode .liquid-toggle {
-    --checked: hsl(39, 100%, 50%);
-  }
-
-  body.light-mode .hero {
-    background: linear-gradient(135deg, #f5efe0 0%, #e8dcc8 100%);
-  }
-
-  body.light-mode .hero-tagline {
-    color: rgba(26,16,8,0.85);
-  }
-
-  body.light-mode .hero-badge {
-    color: var(--marron);
-    border-color: rgba(26,16,8,0.12);
-    background: rgba(255,255,255,0.18);
-  }
-
-  body.light-mode .section-menu {
-    background: #f5efe0;
-  }
-
-  body.light-mode .section-menu::before {
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(26,16,8,0.05) 0px,
-      rgba(26,16,8,0.05) 1px,
-      transparent 1px,
-      transparent 20px
-    );
-  }
-
-  body.light-mode .menu-item,
-  body.light-mode .pizzeta-item,
-  body.light-mode .review-card,
-  body.light-mode .extras-box {
-    background: rgba(255,255,255,0.94);
-  }
-
-  body.light-mode .menu-item-name,
-  body.light-mode .menu-item-desc,
-  body.light-mode .menu-item-price,
-  body.light-mode .extra-item,
-  body.light-mode .review-text,
-  body.light-mode .info-row-text,
-  body.light-mode .review-author {
-    color: var(--marron);
-  }
-
-  body.light-mode .section-info {
-    background: #e8dcc8;
-  }
-
-  body.light-mode .cta-final {
-    background: #f5efe0;
-  }
-
-  body.light-mode footer {
-    background: #e8dcc8;
-    color: rgba(26,16,8,0.75);
-    border-top-color: rgba(26,16,8,0.1);
-  }
-
-  body.light-mode .tab-btn {
-    color: rgba(26,16,8,0.75);
-    border-color: rgba(26,16,8,0.15);
-  }
-
-  body.light-mode .tab-btn:hover,
-  body.light-mode .tab-btn.active {
-    background: var(--dorado);
-    color: var(--negro);
-    border-color: var(--dorado);
-  }
-
-  body.light-mode .gallery-item figcaption {
-    color: var(--marron);
-    background: rgba(255,255,255,0.65);
-  }
-
-  .hero-logo-la {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(3rem, 8vw, 6rem);
-    font-style: italic;
-    color: var(--rojo);
-    line-height: 0.9;
-    display: block;
-  }
-
-  .hero-logo-proa {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(5rem, 15vw, 11rem);
-    font-weight: 900;
-    color: var(--verde);
-    line-height: 0.85;
-    display: block;
-    letter-spacing: -0.02em;
-    text-shadow: 4px 4px 0px var(--verde-oscuro);
-  }
-
-  .hero-logo-de {
-    font-family: 'Special Elite', cursive;
-    color: rgba(255,255,255,0.85);
-    font-size: clamp(1.2rem, 3vw, 2rem);
-    letter-spacing: 0.1em;
-    display: block;
-    margin-top: 0.3rem;
-  }
-
-  .hero-divider {
-    width: 120px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--dorado), transparent);
-    margin: 1.5rem auto;
-    animation: fadeUp 1s 0.6s ease both;
-  }
-
-  .hero-tagline {
-    font-family: 'Lora', serif;
-    font-style: italic;
-    color: rgba(255,255,255,0.7);
-    font-size: clamp(0.95rem, 2vw, 1.15rem);
-    max-width: 380px;
-    line-height: 1.6;
-    animation: fadeUp 1s 0.8s ease both;
-  }
-
-  .hero-cta-group {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 2.5rem;
-    animation: fadeUp 1s 1s ease both;
-  }
-
-  .btn-primary {
-    background: var(--verde);
-    color: white;
-    border: none;
-    font-family: 'Special Elite', cursive;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    padding: 0.9rem 2rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    position: relative;
-    transition: all 0.25s;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  }
-
-  .btn-primary:hover {
-    background: var(--verde-oscuro);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(26,107,42,0.4);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--dorado);
-    border: 1px solid var(--dorado);
-    font-family: 'Special Elite', cursive;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    padding: 0.9rem 2rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.25s;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  }
-
-  .btn-secondary:hover {
-    background: var(--dorado);
-    color: var(--negro);
-    transform: translateY(-2px);
-  }
-
-  .hero-scroll {
+  /* Icons inside toggle */
+  .toggle-icons {
     position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.3);
-    font-family: 'Special Elite', cursive;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    animation: bounce 2s infinite;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    z-index: 20;
+    pointer-events: none;
   }
+
+  .toggle-icon-inner {
+    font-size: 0.75rem;
+    line-height: 1;
+    transition: opacity 0.3s;
+  }
+
+  /* dark mode: moon visible (right), sun dimmed */
+  .toggle-icon-inner.sun { opacity: 0.35; }
+  .toggle-icon-inner.moon { opacity: 1; }
+
+  /* light mode: sun visible (left), moon dimmed */
+  body.light-mode .toggle-icon-inner.sun { opacity: 1; }
+  body.light-mode .toggle-icon-inner.moon { opacity: 0.35; }
+
+  /* ─── LIGHT MODE OVERRIDES ─── */
+  body.light-mode .hero { background: #faf8f5; }
+  body.light-mode .hero-tagline { color: rgba(26,16,8,0.75); }
+  body.light-mode .hero-badge { color: var(--marron); border-color: rgba(26,16,8,0.12); background: rgba(230,220,210,0.3); }
+  body.light-mode .section-menu { background: #faf8f5; }
+  body.light-mode .section-menu::before { background-image: repeating-linear-gradient(45deg, rgba(26,16,8,0.05) 0px, rgba(26,16,8,0.05) 1px, transparent 1px, transparent 20px); }
+  body.light-mode .menu-item, body.light-mode .pizzeta-item, body.light-mode .review-card, body.light-mode .extras-box { background: rgba(245,240,235,0.8); }
+  body.light-mode .menu-header .section-title { color: var(--verde-oscuro); }
+  body.light-mode .menu-item-name, body.light-mode .menu-item-desc, body.light-mode .menu-item-price, body.light-mode .extra-item, body.light-mode .review-text, body.light-mode .info-row-text, body.light-mode .review-author { color: var(--marron); }
+  body.light-mode .section-info { background: #f0eae0; }
+  body.light-mode .cta-final { background: #f0eae0; color: var(--marron); }
+  body.light-mode .cta-final h2 { color: var(--marron); }
+  body.light-mode .cta-final p { color: rgba(26,16,8,0.65); }
+  body.light-mode .cta-phone { color: var(--verde); }
+  body.light-mode .cta-phone:hover { color: var(--dorado); }
+  body.light-mode footer { background: #f0eae0; color: rgba(26,16,8,0.55); border-top-color: rgba(26,16,8,0.1); }
+  body.light-mode .tab-btn { color: rgba(26,16,8,0.65); border-color: rgba(26,16,8,0.15); }
+  body.light-mode .tab-btn:hover, body.light-mode .tab-btn.active { background: var(--dorado); color: var(--negro); border-color: var(--dorado); }
+  body.light-mode .hero-scroll { color: rgba(26,16,8,0.3); }
+  body.light-mode .hero-divider { background: linear-gradient(90deg, transparent, var(--dorado), transparent); }
+  body.light-mode .section-label { color: var(--rojo); }
+  body.light-mode .section-title { color: var(--verde-oscuro); }
+  body.light-mode .section-text { color: rgba(26,16,8,0.75); }
+  body.light-mode .stars-text { color: rgba(26,16,8,0.7); }
+  body.light-mode .review-card { background: rgba(245,240,235,0.7); box-shadow: 2px 2px 0 rgba(0,0,0,0.04); }
+  body.light-mode .review-card:hover { box-shadow: 4px 4px 0 rgba(0,0,0,0.06); }
+  body.light-mode .info-block-title { color: var(--verde-oscuro); border-bottom-color: rgba(26,16,8,0.1); }
+  body.light-mode .info-row-text { color: rgba(26,16,8,0.7); }
+  body.light-mode .gallery-item { background: rgba(245,240,235,0.5); border-color: rgba(26,16,8,0.1); }
+  body.light-mode .info-bar { background: #e8dcc8; color: rgba(26,16,8,0.8); }
+  body.light-mode .info-item { color: rgba(26,16,8,0.8); }
+  body.light-mode .section-nosotros { background: #faf8f5; }
+  body.light-mode .section-reviews { background: #f0eae0; }
+
+  .hero-logo-la { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 6rem); font-style: italic; color: var(--rojo); line-height: 0.9; display: block; }
+  .hero-logo-proa { font-family: 'Playfair Display', serif; font-size: clamp(5rem, 15vw, 11rem); font-weight: 900; color: var(--verde); line-height: 0.85; display: block; letter-spacing: -0.02em; text-shadow: 4px 4px 0px var(--verde-oscuro); }
+  .hero-logo-de { font-family: 'Special Elite', cursive; color: rgba(255,255,255,0.85); font-size: clamp(1.2rem, 3vw, 2rem); letter-spacing: 0.1em; display: block; margin-top: 0.3rem; }
+
+  .hero-divider { width: 120px; height: 2px; background: linear-gradient(90deg, transparent, var(--dorado), transparent); margin: 1.5rem auto; animation: fadeUp 1s 0.6s ease both; }
+  .hero-tagline { font-family: 'Lora', serif; font-style: italic; color: rgba(255,255,255,0.7); font-size: clamp(0.95rem, 2vw, 1.15rem); max-width: 380px; line-height: 1.6; animation: fadeUp 1s 0.8s ease both; }
+  .hero-cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem; animation: fadeUp 1s 1s ease both; }
+
+  .btn-primary { background: var(--verde); color: white; border: none; font-family: 'Special Elite', cursive; font-size: 0.9rem; letter-spacing: 0.08em; padding: 0.9rem 2rem; cursor: pointer; text-decoration: none; display: inline-block; position: relative; transition: all 0.25s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .btn-primary:hover { background: var(--verde-oscuro); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,107,42,0.4); }
+  .btn-secondary { background: transparent; color: var(--dorado); border: 1px solid var(--dorado); font-family: 'Special Elite', cursive; font-size: 0.9rem; letter-spacing: 0.08em; padding: 0.9rem 2rem; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.25s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .btn-secondary:hover { background: var(--dorado); color: var(--negro); transform: translateY(-2px); }
+
+  .hero-scroll { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.3); font-family: 'Special Elite', cursive; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; animation: bounce 2s infinite; }
 
   /* ─── INFO BAR ─── */
-  .info-bar {
-    background: var(--rojo);
-    padding: 0.8rem 2rem;
-    display: flex;
-    justify-content: center;
-    gap: 2.5rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .info-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: rgba(255,255,255,0.92);
-    font-family: 'Special Elite', cursive;
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
-  }
-
+  .info-bar { background: var(--rojo); padding: 0.8rem 2rem; display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap; align-items: center; }
+  .info-item { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.92); font-family: 'Special Elite', cursive; font-size: 0.8rem; letter-spacing: 0.05em; }
   .info-icon { font-size: 1rem; }
 
-  /* ─── SECCIÓN NOSOTROS ─── */
-  .section-nosotros {
-    padding: 6rem 2rem;
-    max-width: 900px;
-    margin: 0 auto;
-    text-align: center;
-    position: relative;
-  }
-
-  .ornament {
-    font-size: 2rem;
-    color: var(--dorado);
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  .section-label {
-    font-family: 'Special Elite', cursive;
-    font-size: 0.72rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--rojo);
-    margin-bottom: 1rem;
-  }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    color: var(--verde-oscuro);
-    line-height: 1.15;
-    margin-bottom: 1.5rem;
-  }
-
-  .section-text {
-    font-size: 1.05rem;
-    line-height: 1.85;
-    color: var(--gris-calido);
-    max-width: 620px;
-    margin: 0 auto;
-  }
-
-  .stars-row {
-    display: flex;
-    justify-content: center;
-    gap: 0.3rem;
-    margin: 1.5rem 0 0.5rem;
-    font-size: 1.2rem;
-    color: var(--dorado);
-  }
-
-  .stars-text {
-    font-family: 'Special Elite', cursive;
-    color: var(--gris-calido);
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
-  }
+  /* ─── NOSOTROS ─── */
+  .section-nosotros { padding: 6rem 2rem; max-width: 900px; margin: 0 auto; text-align: center; position: relative; }
+  .ornament { font-size: 2rem; color: var(--dorado); display: block; margin-bottom: 1rem; }
+  .section-label { font-family: 'Special Elite', cursive; font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rojo); margin-bottom: 1rem; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); color: var(--verde-oscuro); line-height: 1.15; margin-bottom: 1.5rem; }
+  .section-text { font-size: 1.05rem; line-height: 1.85; color: var(--gris-calido); max-width: 620px; margin: 0 auto; }
+  .stars-row { display: flex; justify-content: center; gap: 0.3rem; margin: 1.5rem 0 0.5rem; font-size: 1.2rem; color: var(--dorado); }
+  .stars-text { font-family: 'Special Elite', cursive; color: var(--gris-calido); font-size: 0.85rem; letter-spacing: 0.05em; }
 
   /* ─── MENÚ ─── */
-  .section-menu {
-    background: var(--verde-oscuro);
-    position: relative;
-    overflow: hidden;
-    padding: 5rem 2rem;
-  }
-
-  .section-menu::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,0.015) 0px,
-      rgba(255,255,255,0.015) 1px,
-      transparent 1px,
-      transparent 20px
-    );
-  }
-
-  .menu-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .menu-header {
-    text-align: center;
-    margin-bottom: 3.5rem;
-  }
-
+  .section-menu { background: var(--verde-oscuro); position: relative; overflow: hidden; padding: 5rem 2rem; }
+  .section-menu::before { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 20px); }
+  .menu-inner { max-width: 1000px; margin: 0 auto; position: relative; }
+  .menu-header { text-align: center; margin-bottom: 3.5rem; }
   .menu-header .section-label { color: var(--dorado); }
-
   .menu-header .section-title { color: var(--crema); }
-
-  .menu-gallery {
-    max-width: 1000px;
-    margin: 0 auto 2.5rem;
-    text-align: center;
-    position: relative;
-    z-index: 2;
-  }
-
-  .menu-gallery .section-label {
-    color: rgba(245,239,224,0.7);
-  }
-
-  .gallery-title {
-    font-family: 'Playfair Display', serif;
-    color: var(--crema);
-    font-size: clamp(1.6rem, 3vw, 2.4rem);
-    margin-bottom: 1.2rem;
-  }
-
-  .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-  }
-
-  .gallery-item {
-    overflow: hidden;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.04);
-  }
-
-  .gallery-item img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    display: block;
-  }
-
-  .gallery-item figcaption {
-    padding: 0.85rem 0.95rem;
-    color: var(--crema);
-    font-size: 0.88rem;
-    letter-spacing: 0.04em;
-    background: rgba(0,0,0,0.25);
-  }
-
-  .menu-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 2.5rem;
-  }
-
-  .tab-btn {
-    background: transparent;
-    border: 1px solid rgba(201,168,76,0.35);
-    color: rgba(245,239,224,0.6);
-    font-family: 'Special Elite', cursive;
-    font-size: 0.78rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.5rem 1.2rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .tab-btn:hover, .tab-btn.active {
-    background: var(--dorado);
-    border-color: var(--dorado);
-    color: var(--negro);
-  }
-
+  .menu-gallery { max-width: 1000px; margin: 0 auto 2.5rem; text-align: center; position: relative; z-index: 2; }
+  .menu-gallery .section-label { color: rgba(245,239,224,0.7); }
+  .gallery-title { font-family: 'Playfair Display', serif; color: var(--crema); font-size: clamp(1.6rem, 3vw, 2.4rem); margin-bottom: 1.2rem; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+  .gallery-item { overflow: hidden; border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); }
+  .gallery-item img { width: 100%; height: 220px; object-fit: cover; display: block; }
+  .gallery-item figcaption { padding: 0.85rem 0.95rem; color: var(--crema); font-size: 0.88rem; letter-spacing: 0.04em; background: rgba(0,0,0,0.25); }
+  .menu-tabs { display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .tab-btn { background: transparent; border: 1px solid rgba(201,168,76,0.35); color: rgba(245,239,224,0.6); font-family: 'Special Elite', cursive; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 1.2rem; cursor: pointer; transition: all 0.2s; }
+  .tab-btn:hover, .tab-btn.active { background: var(--dorado); border-color: var(--dorado); color: var(--negro); }
   .menu-panel { display: none; }
   .menu-panel.active { display: block; }
-
-  .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1px;
-    background: rgba(201,168,76,0.12);
-  }
-
-  .menu-item {
-    background: rgba(15,64,25,0.8);
-    padding: 1.4rem 1.6rem;
-    transition: background 0.2s;
-  }
-
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1px; background: rgba(201,168,76,0.12); }
+  .menu-item { background: rgba(15,64,25,0.8); padding: 1.4rem 1.6rem; transition: background 0.2s; }
   .menu-item:hover { background: rgba(15,64,25,1); }
-
-  .menu-item-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.05rem;
-    color: var(--crema);
-    margin-bottom: 0.4rem;
-  }
-
-  .menu-item-desc {
-    font-size: 0.82rem;
-    color: rgba(245,239,224,0.55);
-    line-height: 1.5;
-    font-style: italic;
-    margin-bottom: 0.7rem;
-  }
-
-  .menu-item-price {
-    font-family: 'Special Elite', cursive;
-    color: var(--dorado);
-    font-size: 1rem;
-    letter-spacing: 0.05em;
-  }
-
-  /* Extras */
-  .extras-box {
-    border: 1px solid rgba(201,168,76,0.2);
-    padding: 1.2rem 1.6rem;
-    margin-top: 1px;
-    background: rgba(15,64,25,0.4);
-  }
-
-  .extras-title {
-    font-family: 'Special Elite', cursive;
-    color: var(--dorado);
-    font-size: 0.78rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
-  }
-
-  .extras-list {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .extra-item {
-    color: rgba(245,239,224,0.6);
-    font-size: 0.82rem;
-  }
-
-  .extra-item span {
-    color: var(--dorado);
-    font-family: 'Special Elite', cursive;
-  }
-
-  /* Pizzetas grid especial */
-  .pizzeta-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1px;
-    background: rgba(201,168,76,0.12);
-  }
-
-  .pizzeta-item {
-    background: rgba(15,64,25,0.8);
-    padding: 1rem 1.2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 0.5rem;
-    transition: background 0.2s;
-  }
-
+  .menu-item-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--crema); margin-bottom: 0.4rem; }
+  .menu-item-desc { font-size: 0.82rem; color: rgba(245,239,224,0.55); line-height: 1.5; font-style: italic; margin-bottom: 0.7rem; }
+  .menu-item-price { font-family: 'Special Elite', cursive; color: var(--dorado); font-size: 1rem; letter-spacing: 0.05em; }
+  .extras-box { border: 1px solid rgba(201,168,76,0.2); padding: 1.2rem 1.6rem; margin-top: 1px; background: rgba(15,64,25,0.4); }
+  .extras-title { font-family: 'Special Elite', cursive; color: var(--dorado); font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .extras-list { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .extra-item { color: rgba(245,239,224,0.6); font-size: 0.82rem; }
+  .extra-item span { color: var(--dorado); font-family: 'Special Elite', cursive; }
+  .pizzeta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1px; background: rgba(201,168,76,0.12); }
+  .pizzeta-item { background: rgba(15,64,25,0.8); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; transition: background 0.2s; }
   .pizzeta-item:hover { background: rgba(15,64,25,1); }
-
-  .pizzeta-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    font-weight: 900;
-    color: rgba(201,168,76,0.3);
-    min-width: 2rem;
-    line-height: 1;
-  }
-
+  .pizzeta-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: rgba(201,168,76,0.3); min-width: 2rem; line-height: 1; }
   .pizzeta-info { flex: 1; }
-
-  .pizzeta-desc {
-    font-size: 0.8rem;
-    color: rgba(245,239,224,0.6);
-    font-style: italic;
-    line-height: 1.4;
-  }
-
-  .pizzeta-price {
-    font-family: 'Special Elite', cursive;
-    color: var(--dorado);
-    font-size: 0.85rem;
-    white-space: nowrap;
-  }
+  .pizzeta-desc { font-size: 0.8rem; color: rgba(245,239,224,0.6); font-style: italic; line-height: 1.4; }
+  .pizzeta-price { font-family: 'Special Elite', cursive; color: var(--dorado); font-size: 0.85rem; white-space: nowrap; }
 
   /* ─── REVIEWS ─── */
-  .section-reviews {
-    padding: 5rem 2rem;
-    background: var(--crema-oscuro);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .section-reviews::before {
-    content: '❝';
-    position: absolute;
-    font-size: 20rem;
-    color: rgba(26,107,42,0.05);
-    top: -3rem;
-    left: -2rem;
-    font-family: Georgia, serif;
-    line-height: 1;
-  }
-
-  .reviews-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
-
+  .section-reviews { padding: 5rem 2rem; background: var(--crema-oscuro); position: relative; overflow: hidden; }
+  .section-reviews::before { content: '❝'; position: absolute; font-size: 20rem; color: rgba(26,107,42,0.05); top: -3rem; left: -2rem; font-family: Georgia, serif; line-height: 1; }
+  .reviews-inner { max-width: 1000px; margin: 0 auto; }
   .reviews-header { text-align: center; margin-bottom: 3rem; }
+  .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  .review-card { background: var(--crema); padding: 1.8rem; border-left: 3px solid var(--verde); position: relative; box-shadow: 4px 4px 0 rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+  .review-card:hover { transform: translateY(-3px); box-shadow: 6px 8px 0 rgba(0,0,0,0.09); }
+  .review-stars { color: var(--dorado); font-size: 0.85rem; margin-bottom: 0.8rem; }
+  .review-text { font-size: 0.9rem; line-height: 1.7; color: var(--gris-calido); font-style: italic; margin-bottom: 1rem; }
+  .review-author { font-family: 'Special Elite', cursive; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--verde); text-transform: uppercase; }
 
-  .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .review-card {
-    background: var(--crema);
-    padding: 1.8rem;
-    border-left: 3px solid var(--verde);
-    position: relative;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.06);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .review-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 6px 8px 0 rgba(0,0,0,0.09);
-  }
-
-  .review-stars {
-    color: var(--dorado);
-    font-size: 0.85rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .review-text {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: var(--gris-calido);
-    font-style: italic;
-    margin-bottom: 1rem;
-  }
-
-  .review-author {
-    font-family: 'Special Elite', cursive;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    color: var(--verde);
-    text-transform: uppercase;
-  }
-
-  /* ─── INFO PRÁCTICA ─── */
-  .section-info {
-    padding: 5rem 2rem;
-    background: var(--negro);
-  }
-
-  .info-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 3rem;
-    align-items: start;
-  }
-
-  .info-block-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    color: var(--crema);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(201,168,76,0.3);
-  }
-
-  .info-row {
-    display: flex;
-    gap: 0.8rem;
-    margin-bottom: 1rem;
-    align-items: flex-start;
-  }
-
-  .info-row-icon {
-    font-size: 1.1rem;
-    margin-top: 0.1rem;
-    flex-shrink: 0;
-  }
-
-  .info-row-text {
-    color: rgba(245,239,224,0.7);
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
-
-  .info-row-text strong {
-    color: var(--dorado);
-    font-family: 'Special Elite', cursive;
-    font-size: 0.82rem;
-    letter-spacing: 0.05em;
-    display: block;
-    margin-bottom: 0.15rem;
-  }
-
-  .info-row-text a {
-    color: rgba(245,239,224,0.7);
-    text-decoration: none;
-  }
-
+  /* ─── INFO ─── */
+  .section-info { padding: 5rem 2rem; background: var(--negro); }
+  .info-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 3rem; align-items: start; }
+  .info-block-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--crema); margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(201,168,76,0.3); }
+  .info-row { display: flex; gap: 0.8rem; margin-bottom: 1rem; align-items: flex-start; }
+  .info-row-icon { font-size: 1.1rem; margin-top: 0.1rem; flex-shrink: 0; }
+  .info-row-text { color: rgba(245,239,224,0.7); font-size: 0.9rem; line-height: 1.6; }
+  .info-row-text strong { color: var(--dorado); font-family: 'Special Elite', cursive; font-size: 0.82rem; letter-spacing: 0.05em; display: block; margin-bottom: 0.15rem; }
+  .info-row-text a { color: rgba(245,239,224,0.7); text-decoration: none; }
   .info-row-text a:hover { color: var(--dorado); }
+  .pago-note { margin-top: 1rem; font-family: 'Special Elite', cursive; font-size: 0.75rem; letter-spacing: 0.08em; color: rgba(245,239,224,0.4); text-transform: uppercase; }
 
-  .pago-note {
-    margin-top: 1rem;
-    font-family: 'Special Elite', cursive;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    color: rgba(245,239,224,0.4);
-    text-transform: uppercase;
-  }
-
-  /* CTA final */
-  .cta-final {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: var(--rojo-oscuro);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .cta-final::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      -45deg,
-      rgba(0,0,0,0.08) 0px,
-      rgba(0,0,0,0.08) 1px,
-      transparent 1px,
-      transparent 18px
-    );
-  }
-
+  /* ─── CTA ─── */
+  .cta-final { text-align: center; padding: 4rem 2rem; background: var(--rojo-oscuro); position: relative; overflow: hidden; }
+  .cta-final::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 18px); }
   .cta-final-inner { position: relative; }
-
-  .cta-final h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    color: white;
-    margin-bottom: 0.8rem;
-  }
-
-  .cta-final p {
-    color: rgba(255,255,255,0.7);
-    font-style: italic;
-    margin-bottom: 2rem;
-    font-size: 1rem;
-  }
-
-  .cta-phone {
-    font-family: 'Special Elite', cursive;
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    color: var(--crema);
-    display: block;
-    margin-bottom: 1.5rem;
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: color 0.2s;
-  }
-
+  .cta-final h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 3rem); color: white; margin-bottom: 0.8rem; }
+  .cta-final p { color: rgba(255,255,255,0.7); font-style: italic; margin-bottom: 2rem; font-size: 1rem; }
+  .cta-phone { font-family: 'Special Elite', cursive; font-size: clamp(2rem, 6vw, 3.5rem); color: var(--crema); display: block; margin-bottom: 1.5rem; text-decoration: none; letter-spacing: 0.05em; transition: color 0.2s; }
   .cta-phone:hover { color: var(--dorado); }
-
-  .cta-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn-wa {
-    background: #25D366;
-    color: white;
-    border: none;
-    font-family: 'Special Elite', cursive;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    padding: 1rem 2.2rem;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.25s;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  }
-
-  .btn-wa:hover {
-    background: #128C7E;
-    transform: translateY(-2px);
-  }
+  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-wa { background: #25D366; color: white; border: none; font-family: 'Special Elite', cursive; font-size: 0.9rem; letter-spacing: 0.08em; padding: 1rem 2.2rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.25s; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); }
+  .btn-wa:hover { background: #128C7E; transform: translateY(-2px); }
 
   /* ─── FOOTER ─── */
-  footer {
-    background: var(--negro);
-    border-top: 1px solid rgba(201,168,76,0.15);
-    padding: 1.5rem 2rem;
-    text-align: center;
-    font-family: 'Special Elite', cursive;
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.25);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+  footer { background: var(--negro); border-top: 1px solid rgba(201,168,76,0.15); padding: 1.5rem 2rem; text-align: center; font-family: 'Special Elite', cursive; font-size: 0.72rem; color: rgba(255,255,255,0.25); letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* ─── ANIMACIONES ─── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
 
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(6px); }
-  }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
 
   /* ─── MOBILE ─── */
   @media (max-width: 600px) {
@@ -1034,36 +541,42 @@
     .tab-btn { font-size: 0.7rem; padding: 0.4rem 0.9rem; }
     .info-inner { gap: 2rem; }
   }
+
+  /* sr-only utility */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
 </style>
+</head>
+<body>
+
+<!-- SVG filters for liquid glass -->
 <svg class="sr-only" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <filter id="goo">
-      <feGaussianBlur result="coloredBlur" in="SourceGraphic" stdDeviation="13"></feGaussianBlur>
-      <feMerge>
-        <feMergeNode in="coloredBlur"></feMergeNode>
-        <feMergeNode in="SourceGraphic"></feMergeNode>
-      </feMerge>
+      <feGaussianBlur result="SvgjsFeGaussianBlur1000" in="SourceGraphic" stdDeviation="13"></feGaussianBlur>
+      <feColorMatrix result="SvgjsFeColorMatrix1001" in="SvgjsFeGaussianBlur1000"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 13 -10" type="matrix"></feColorMatrix>
+      <feComposite result="SvgjsFeComposite1002" in="SvgjsFeColorMatrix1001" operator="atop"></feComposite>
     </filter>
     <filter id="remove-black" color-interpolation-filters="sRGB">
-      <feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 -255 -255 -255 0 1" result="black-pixels"/>
+      <feColorMatrix type="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -255 -255 -255 0 1"
+        result="black-pixels"/>
       <feMorphology in="black-pixels" operator="dilate" radius="0.5" result="smoothed"/>
       <feComposite in="SourceGraphic" in2="smoothed" operator="out"/>
     </filter>
   </defs>
 </svg>
-</head>
-<body>
 
 <!-- ══ HERO ══ -->
 <section class="hero">
   <div class="liquid-toggle-container">
-    <button aria-label="toggle" aria-pressed="false" class="liquid-toggle" id="themeToggle">
+    <span class="toggle-label" id="toggleLabel">oscuro</span>
+    <button aria-label="Cambiar tema" aria-pressed="false" class="liquid-toggle" id="themeToggle">
       <div class="knockout">
         <div class="indicator indicator--masked">
           <div class="mask"></div>
         </div>
       </div>
-      <div class="indicator"></div>
       <div class="indicator__liquid">
         <div class="shadow"></div>
         <div class="wrapper">
@@ -1073,6 +586,10 @@
           </div>
         </div>
         <div class="cover"></div>
+      </div>
+      <div class="toggle-icons">
+        <span class="toggle-icon-inner sun">☀️</span>
+        <span class="toggle-icon-inner moon">🌙</span>
       </div>
     </button>
   </div>
@@ -1147,72 +664,24 @@
     <!-- MILANESAS -->
     <div class="menu-panel active" id="tab-milanesas">
       <div class="menu-grid">
-        <div class="menu-item">
-          <div class="menu-item-name">La Proa</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, jamón, muzzarella, salsa de tomate y guarnición</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Chihuahua</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, 4 quesos gratinado y guarnición</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Jalisco</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, jamón, muzzarella, morrón, huevo duro, salsa picante o de tomate y guarnición</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Tijuana</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, carne, tomate, muzzarella, ajo, perejil y guarnición</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Chingona</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, panceta, cheddar, cebolla frita, huevo frito y guarnición</div>
-          <div class="menu-item-price">$590</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Completa</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, mayonesa, panceta, muzzarella, jamón, huevo frito o duro, aceitunas, morrón y cebolla fritos, c/papas fritas</div>
-          <div class="menu-item-price">$590</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Común</div>
-          <div class="menu-item-desc">Pan azteca, lechuga, tomate, mayonesa y guarnición</div>
-          <div class="menu-item-price">$490</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Mila Sola</div>
-          <div class="menu-item-desc">Solo la milanesa</div>
-          <div class="menu-item-price">$350</div>
-        </div>
+        <div class="menu-item"><div class="menu-item-name">La Proa</div><div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, jamón, muzzarella, salsa de tomate y guarnición</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Chihuahua</div><div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, 4 quesos gratinado y guarnición</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Jalisco</div><div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, jamón, muzzarella, morrón, huevo duro, salsa picante o de tomate y guarnición</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Tijuana</div><div class="menu-item-desc">Pan azteca, lechuga, carne, tomate, muzzarella, ajo, perejil y guarnición</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Chingona</div><div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, panceta, cheddar, cebolla frita, huevo frito y guarnición</div><div class="menu-item-price">$590</div></div>
+        <div class="menu-item"><div class="menu-item-name">Completa</div><div class="menu-item-desc">Pan azteca, lechuga, tomate, carne, mayonesa, panceta, muzzarella, jamón, huevo frito o duro, aceitunas, morrón y cebolla fritos, c/papas fritas</div><div class="menu-item-price">$590</div></div>
+        <div class="menu-item"><div class="menu-item-name">Común</div><div class="menu-item-desc">Pan azteca, lechuga, tomate, mayonesa y guarnición</div><div class="menu-item-price">$490</div></div>
+        <div class="menu-item"><div class="menu-item-name">Mila Sola</div><div class="menu-item-desc">Solo la milanesa</div><div class="menu-item-price">$350</div></div>
       </div>
     </div>
 
     <!-- CHIVITOS -->
     <div class="menu-panel" id="tab-chivitos">
       <div class="menu-grid">
-        <div class="menu-item">
-          <div class="menu-item-name">La Proa</div>
-          <div class="menu-item-desc">Pan azteca, tomate, lechuga, mayonesa, carne, panceta, muzzarella, jamón, huevo frito, aceitunas, morrón y cebolla fritos, c/papas fritas</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Canadiense</div>
-          <div class="menu-item-desc">Pan azteca, tomate, lechuga, mayonesa, carne, panceta, muzzarella, jamón, huevo duro, aceitunas, morrón y cebolla fritos, c/papas fritas</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Ahogado</div>
-          <div class="menu-item-desc">Igual que La Proa pero bañado en salsa mexicana, c/papas fritas</div>
-          <div class="menu-item-price">$565</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Chingón</div>
-          <div class="menu-item-desc">Pan azteca, tomate, lechuga, mayonesa, carne, panceta, cheddar, jamón, huevo frito o duro, aceitunas, cebolla frita, c/papas fritas</div>
-          <div class="menu-item-price">$565</div>
-        </div>
+        <div class="menu-item"><div class="menu-item-name">La Proa</div><div class="menu-item-desc">Pan azteca, tomate, lechuga, mayonesa, carne, panceta, muzzarella, jamón, huevo frito, aceitunas, morrón y cebolla fritos, c/papas fritas</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Canadiense</div><div class="menu-item-desc">Pan azteca, tomate, lechuga, mayonesa, carne, panceta, muzzarella, jamón, huevo duro, aceitunas, morrón y cebolla fritos, c/papas fritas</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Ahogado</div><div class="menu-item-desc">Igual que La Proa pero bañado en salsa mexicana, c/papas fritas</div><div class="menu-item-price">$565</div></div>
+        <div class="menu-item"><div class="menu-item-name">Chingón</div><div class="menu-item-desc">Pan azteca, tomate, lechuga, mayonesa, carne, panceta, cheddar, jamón, huevo frito o duro, aceitunas, cebolla frita, c/papas fritas</div><div class="menu-item-price">$565</div></div>
       </div>
       <div class="extras-box">
         <div class="extras-title">Extras</div>
@@ -1227,47 +696,19 @@
     <!-- SANDWICHES -->
     <div class="menu-panel" id="tab-sandwiches">
       <div class="menu-grid">
-        <div class="menu-item">
-          <div class="menu-item-name">Sandwich Caliente</div>
-          <div class="menu-item-desc">Pan azteca, jamón y muzzarella</div>
-          <div class="menu-item-price">$330</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Caliente Napolitano</div>
-          <div class="menu-item-desc">Pan azteca, jamón, muzzarella, tomate y orégano</div>
-          <div class="menu-item-price">$370</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Caliente Caprese</div>
-          <div class="menu-item-desc">Pan azteca, jamón, muzzarella, tomate y albahaca</div>
-          <div class="menu-item-price">$370</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Caliente Chingón</div>
-          <div class="menu-item-desc">Pan azteca, panceta, cheddar, cebolla frita y huevo frito</div>
-          <div class="menu-item-price">$395</div>
-        </div>
+        <div class="menu-item"><div class="menu-item-name">Sandwich Caliente</div><div class="menu-item-desc">Pan azteca, jamón y muzzarella</div><div class="menu-item-price">$330</div></div>
+        <div class="menu-item"><div class="menu-item-name">Caliente Napolitano</div><div class="menu-item-desc">Pan azteca, jamón, muzzarella, tomate y orégano</div><div class="menu-item-price">$370</div></div>
+        <div class="menu-item"><div class="menu-item-name">Caliente Caprese</div><div class="menu-item-desc">Pan azteca, jamón, muzzarella, tomate y albahaca</div><div class="menu-item-price">$370</div></div>
+        <div class="menu-item"><div class="menu-item-name">Caliente Chingón</div><div class="menu-item-desc">Pan azteca, panceta, cheddar, cebolla frita y huevo frito</div><div class="menu-item-price">$395</div></div>
       </div>
     </div>
 
     <!-- FRITAS -->
     <div class="menu-panel" id="tab-fritas">
       <div class="menu-grid">
-        <div class="menu-item">
-          <div class="menu-item-name">Gramajo</div>
-          <div class="menu-item-desc">Papas fritas con jamón y huevo</div>
-          <div class="menu-item-price">$450</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Papas Fritas</div>
-          <div class="menu-item-desc">Clásicas</div>
-          <div class="menu-item-price">$330</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Papas con Gustos</div>
-          <div class="menu-item-desc">Salsa 4 quesos, Salsa champi, Salsa brava o Salsa cheddar</div>
-          <div class="menu-item-price">$450</div>
-        </div>
+        <div class="menu-item"><div class="menu-item-name">Gramajo</div><div class="menu-item-desc">Papas fritas con jamón y huevo</div><div class="menu-item-price">$450</div></div>
+        <div class="menu-item"><div class="menu-item-name">Papas Fritas</div><div class="menu-item-desc">Clásicas</div><div class="menu-item-price">$330</div></div>
+        <div class="menu-item"><div class="menu-item-name">Papas con Gustos</div><div class="menu-item-desc">Salsa 4 quesos, Salsa champi, Salsa brava o Salsa cheddar</div><div class="menu-item-price">$450</div></div>
       </div>
     </div>
 
@@ -1307,26 +748,10 @@
     <!-- CALZONE & FAINA -->
     <div class="menu-panel" id="tab-calzone">
       <div class="menu-grid">
-        <div class="menu-item">
-          <div class="menu-item-name">Calzone</div>
-          <div class="menu-item-desc">Mismos gustos que las pizzetas</div>
-          <div class="menu-item-price">$560</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Fainá</div>
-          <div class="menu-item-desc">Clásica</div>
-          <div class="menu-item-price">$160</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Fainá con Muzzarella</div>
-          <div class="menu-item-desc"></div>
-          <div class="menu-item-price">$230</div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-name">Fainá Muzzarella + Gusto</div>
-          <div class="menu-item-desc">Un gusto a elección</div>
-          <div class="menu-item-price">$255</div>
-        </div>
+        <div class="menu-item"><div class="menu-item-name">Calzone</div><div class="menu-item-desc">Mismos gustos que las pizzetas</div><div class="menu-item-price">$560</div></div>
+        <div class="menu-item"><div class="menu-item-name">Fainá</div><div class="menu-item-desc">Clásica</div><div class="menu-item-price">$160</div></div>
+        <div class="menu-item"><div class="menu-item-name">Fainá con Muzzarella</div><div class="menu-item-desc"></div><div class="menu-item-price">$230</div></div>
+        <div class="menu-item"><div class="menu-item-name">Fainá Muzzarella + Gusto</div><div class="menu-item-desc">Un gusto a elección</div><div class="menu-item-price">$255</div></div>
       </div>
     </div>
   </div>
@@ -1340,26 +765,10 @@
       <h2 class="section-title" style="color:var(--verde-oscuro)">Reseñas reales de Google</h2>
     </div>
     <div class="reviews-grid">
-      <div class="review-card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Pido desde 2011, misma calidad, misma relación calidad precio. 13 años y los seguimos eligiendo."</p>
-        <div class="review-author">Cliente fiel desde 2011</div>
-      </div>
-      <div class="review-card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Una de las mejores y más grandes pizzas de la ciudad. Siempre pedimos aquí y el sabor es bueno."</p>
-        <div class="review-author">Reseña de Google</div>
-      </div>
-      <div class="review-card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Gran chivito repleto de papas. Buena temperatura, tamaño gigante y sazón justa. Nos volveremos a encontrar."</p>
-        <div class="review-author">Reseña de Google</div>
-      </div>
-      <div class="review-card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"De las mejores pizzas de Montevideo con una excelente atención. Buenos precios."</p>
-        <div class="review-author">Reseña de Google</div>
-      </div>
+      <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">"Pido desde 2011, misma calidad, misma relación calidad precio. 13 años y los seguimos eligiendo."</p><div class="review-author">Cliente fiel desde 2011</div></div>
+      <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">"Una de las mejores y más grandes pizzas de la ciudad. Siempre pedimos aquí y el sabor es bueno."</p><div class="review-author">Reseña de Google</div></div>
+      <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">"Gran chivito repleto de papas. Buena temperatura, tamaño gigante y sazón justa. Nos volveremos a encontrar."</p><div class="review-author">Reseña de Google</div></div>
+      <div class="review-card reveal"><div class="review-stars">★★★★★</div><p class="review-text">"De las mejores pizzas de Montevideo con una excelente atención. Buenos precios."</p><div class="review-author">Reseña de Google</div></div>
     </div>
   </div>
 </section>
@@ -1369,52 +778,16 @@
   <div class="info-inner">
     <div class="reveal">
       <h3 class="info-block-title">Cómo pedimos</h3>
-      <div class="info-row">
-        <span class="info-row-icon">📞</span>
-        <div class="info-row-text">
-          <strong>Teléfono</strong>
-          <a href="tel:27103009">2710 3009</a>
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-row-icon">💬</span>
-        <div class="info-row-text">
-          <strong>WhatsApp</strong>
-          <a href="https://wa.me/59896363001" target="_blank">096 363 001</a>
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-row-icon">📍</span>
-        <div class="info-row-text">
-          <strong>Zona de reparto</strong>
-          Pocitos y alrededores, Montevideo
-        </div>
-      </div>
+      <div class="info-row"><span class="info-row-icon">📞</span><div class="info-row-text"><strong>Teléfono</strong><a href="tel:27103009">2710 3009</a></div></div>
+      <div class="info-row"><span class="info-row-icon">💬</span><div class="info-row-text"><strong>WhatsApp</strong><a href="https://wa.me/59896363001" target="_blank">096 363 001</a></div></div>
+      <div class="info-row"><span class="info-row-icon">📍</span><div class="info-row-text"><strong>Zona de reparto</strong>Pocitos y alrededores, Montevideo</div></div>
       <p class="pago-note">💵 Efectivo o transferencia bancaria</p>
     </div>
     <div class="reveal">
       <h3 class="info-block-title">Horarios</h3>
-      <div class="info-row">
-        <span class="info-row-icon">📅</span>
-        <div class="info-row-text">
-          <strong>Lunes a Jueves</strong>
-          19:30 – 23:30
-        </div>
-      </div>
-      <div class="info-row">
-        <span class="info-row-icon">🎉</span>
-        <div class="info-row-text">
-          <strong>Viernes, Sábado y Domingo</strong>
-          19:30 – 00:30
-        </div>
-      </div>
-      <div class="info-row" style="margin-top:1.5rem">
-        <span class="info-row-icon">📸</span>
-        <div class="info-row-text">
-          <strong>Seguinos en Instagram</strong>
-          <a href="https://www.instagram.com/laproadeellauri/" target="_blank">@laproadeellauri</a>
-        </div>
-      </div>
+      <div class="info-row"><span class="info-row-icon">📅</span><div class="info-row-text"><strong>Lunes a Jueves</strong>19:30 – 23:30</div></div>
+      <div class="info-row"><span class="info-row-icon">🎉</span><div class="info-row-text"><strong>Viernes, Sábado y Domingo</strong>19:30 – 00:30</div></div>
+      <div class="info-row" style="margin-top:1.5rem"><span class="info-row-icon">📸</span><div class="info-row-text"><strong>Seguinos en Instagram</strong><a href="https://www.instagram.com/laproadeellauri/" target="_blank">@laproadeellauri</a></div></div>
     </div>
   </div>
 </section>
@@ -1450,50 +823,66 @@
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
     });
   }, { threshold: 0.15 });
-
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-  const themeToggle = document.getElementById('themeToggle');
-  const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const initialTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+  // ── Liquid Glass Toggle ──
+  const toggle = document.getElementById('themeToggle');
+  const label = document.getElementById('toggleLabel');
+
+  function setComplete(val) {
+    toggle.style.setProperty('--complete', val);
+    // also sync the liquid__track translate via CSS var
+  }
 
   function applyTheme(theme) {
     const isLight = theme === 'light';
+    document.documentElement.classList.toggle('light-mode', isLight);
     document.body.classList.toggle('light-mode', isLight);
-    themeToggle.setAttribute('aria-pressed', isLight);
-    if (isLight) {
-      themeToggle.style.setProperty('--complete', '100');
-    } else {
-      themeToggle.style.setProperty('--complete', '0');
-    }
+    toggle.setAttribute('aria-pressed', String(isLight));
+    label.textContent = isLight ? 'claro' : 'oscuro';
     localStorage.setItem('theme', theme);
+
+    // Animate the toggle
+    const target = isLight ? 100 : 0;
+    animateComplete(target);
   }
 
-  applyTheme(initialTheme);
+  let animFrame;
+  function animateComplete(target) {
+    cancelAnimationFrame(animFrame);
+    const current = parseFloat(toggle.style.getPropertyValue('--complete') || '0');
+    const diff = target - current;
+    if (Math.abs(diff) < 0.5) { setComplete(target); return; }
+    setComplete(current + diff * 0.18);
+    animFrame = requestAnimationFrame(() => animateComplete(target));
+  }
 
-  themeToggle.addEventListener('click', () => {
+  // Init
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+  // Set immediately without animation
+  const initIsLight = initialTheme === 'light';
+  document.documentElement.classList.toggle('light-mode', initIsLight);
+  document.body.classList.toggle('light-mode', initIsLight);
+  toggle.setAttribute('aria-pressed', String(initIsLight));
+  label.textContent = initIsLight ? 'claro' : 'oscuro';
+  setComplete(initIsLight ? 100 : 0);
+
+  toggle.addEventListener('click', () => {
     const isLight = document.body.classList.contains('light-mode');
-    const nextTheme = isLight ? 'dark' : 'light';
-    applyTheme(nextTheme);
+    applyTheme(isLight ? 'dark' : 'light');
   });
 
-  themeToggle.addEventListener('mousedown', () => {
-    themeToggle.dataset.active = 'true';
-  });
-
-  themeToggle.addEventListener('mouseup', () => {
-    themeToggle.dataset.active = 'false';
-  });
-
-  themeToggle.addEventListener('mouseleave', () => {
-    themeToggle.dataset.active = 'false';
+  toggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const isLight = document.body.classList.contains('light-mode');
+      applyTheme(isLight ? 'dark' : 'light');
+    }
   });
 </script>
 </body>
