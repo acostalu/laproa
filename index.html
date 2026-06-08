@@ -362,13 +362,12 @@
     .tab-btn { font-size: 0.7rem; padding: 0.4rem 0.9rem; }
     .info-inner { gap: 2rem; }
 
-    .glass-nav { bottom: 1.2rem; }
-    .glass-nav .glass-content { padding: 0.4rem 0.5rem; }
-    .nav-item {
-      font-size: 0.58rem;
-      letter-spacing: 0.04em;
-      padding: 0.4rem 0.55rem;
-    }
+    .glass-nav { bottom: 1rem; }
+    .glass-nav .glass-content { padding: 0.35rem 0.4rem; }
+    .nav-list { gap: 0; }
+    .nav-item { padding: 0.5rem 0.7rem; }
+    .nav-label { display: none; }
+    .nav-icon { display: inline; font-size: 1.1rem; line-height: 1; }
   }
 
   /* sr-only utility */
@@ -433,6 +432,9 @@
     z-index: 4;
     padding: 0.55rem 0.7rem;
   }
+
+  .nav-icon { display: none; }
+  .nav-label { display: inline; }
 
   .nav-list {
     list-style: none;
@@ -517,11 +519,11 @@
   <div class="glass-content">
     <div class="nav-pill" id="navPill"></div>
     <ul class="nav-list">
-      <li><a href="#inicio"   class="nav-item active" data-section="inicio">Inicio</a></li>
-      <li><a href="#nosotros" class="nav-item" data-section="nosotros">Nosotros</a></li>
-      <li><a href="#menu"     class="nav-item" data-section="menu">Menú</a></li>
-      <li><a href="#resenas"  class="nav-item" data-section="resenas">Reseñas</a></li>
-      <li><a href="#contacto" class="nav-item" data-section="contacto">Contacto</a></li>
+      <li><a href="#inicio"   class="nav-item active" data-section="inicio"><span class="nav-label">Inicio</span><span class="nav-icon">🏠</span></a></li>
+      <li><a href="#nosotros" class="nav-item" data-section="nosotros"><span class="nav-label">Nosotros</span><span class="nav-icon">👋</span></a></li>
+      <li><a href="#menu"     class="nav-item" data-section="menu"><span class="nav-label">Menú</span><span class="nav-icon">🍽️</span></a></li>
+      <li><a href="#resenas"  class="nav-item" data-section="resenas"><span class="nav-label">Reseñas</span><span class="nav-icon">⭐</span></a></li>
+      <li><a href="#contacto" class="nav-item" data-section="contacto"><span class="nav-label">Contacto</span><span class="nav-icon">📞</span></a></li>
     </ul>
   </div>
 </nav>
