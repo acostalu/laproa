@@ -834,9 +834,22 @@
         updateNavTone(id);
       }
     });
-  }, { rootMargin: '-40% 0px -55% 0px' });
+  }, { rootMargin: '-30% 0px -65% 0px' });
 
   sections.forEach(s => sectionObserver.observe(s));
+
+  // Force last section when scrolled to bottom
+  window.addEventListener('scroll', () => {
+    const atBottom = (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 10;
+    if (atBottom) {
+      const last = sections[sections.length - 1];
+      if (last) {
+        const match = glassNav.querySelector(`.nav-item[data-section="${last.id}"]`);
+        if (match) movePill(match, true);
+        updateNavTone(last.id);
+      }
+    }
+  }, { passive: true });
 
   // Smooth scroll on click
   navItems.forEach(item => {
